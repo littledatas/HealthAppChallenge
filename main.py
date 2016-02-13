@@ -2,12 +2,14 @@ import os
 import json, urllib
 from datetime import datetime
 
-from flask import Flask
+from flask import Flask, jsonify
 app = Flask(__name__)
 
 BASEURL = "http://fhir2.healthintersections.com.au/open/"
 SEARCHURL = "/_search?_format=text/json&"
 SORTURL = "&search-sort=_id"
+
+janegriffinid = 'ad2f3d7c-4274-4422-a10a-8e2bc99c40'
 
 @app.route('/patient')
 def getPatient(firstname = "Jane", lastname = "Griffin"):
@@ -25,11 +27,12 @@ def getPatient(firstname = "Jane", lastname = "Griffin"):
 	born = datetime.strptime(patient['Birthday'], dateformat)
 	today = datetime.today()
 	patient['Age'] = today.year - born.year - ((today.month, today.day) < (born.month, born.day))
+	patient['Id'] = data['entry'][0]['resource']['id']
 
-	return json.dumps(patient)
+	return jsonify(**patient)
 
 @app.route('/medicationorder')
-def getmedicationorder():
+def getmedicationorder(id = janegriffinid):
 
     return 'Hello World!'
 

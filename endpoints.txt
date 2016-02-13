@@ -1,3 +1,4 @@
+patient
 observation
 condition
 encounter
