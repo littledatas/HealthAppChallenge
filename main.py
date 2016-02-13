@@ -9,7 +9,7 @@ BASEURL = "http://fhir2.healthintersections.com.au/open/"
 SEARCHURL = "/_search?_format=text/json&"
 SORTURL = "&search-sort=_id"
 
-janegriffinid = 'ad2f3d7c-4274-4422-a10a-8e2bc99c40'
+janegriffinid = 'ad2f3d7c%2D4274%2D4422%2Da10a%2D8e2bc99c40'
 
 @app.route('/patient')
 def getPatient(firstname = "Jane", lastname = "Griffin"):
@@ -31,11 +31,18 @@ def getPatient(firstname = "Jane", lastname = "Griffin"):
 
 	return jsonify(**patient)
 
-@app.route('/medicationorder')
-def getmedicationorder(id = janegriffinid):
+@app.route('/allergies')
+def getAllergies(id = janegriffinid):
+	url = BASEURL + "AllergyIntolerance" + SEARCHURL + "patient._id=" + janegriffinid + SORTURL
+	response = urllib.urlopen(url)
+	data = json.loads(response.read())
 
-    return 'Hello World!'
+	allergieslist = []
+	allergieslist += [data['entry'][0]['resource']['substance']['coding'][0]['display']]
+	allergies = {"Allergies":allergieslist}
 
+	return jsonify(**allergies)
+#search-id=c6fba785-9c00-4505-b42c-499dd43e8b&&patient._id=ad2f3d7c%2D4274%2D4422%2Da10a%2D8e2bc99c40&search-sort=_id 
 
 
 if __name__ == '__main__':
