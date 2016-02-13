@@ -42,7 +42,15 @@ def getAllergies(id = janegriffinid):
 	data = json.loads(response.read())
 
 	allergieslist = []
-	allergieslist += [data['entry'][0]['resource']['substance']['coding'][0]['display']]
+	for aller in data['entry']:
+		allergy = {}
+		allergy['AllergyId'] = aller['resource']['id']
+		allergy['PractitionerId'] = aller['resource']['recorder']['reference']
+		allergy['PatientId'] = aller['resource']['patient']['reference']
+		allergy['AllergyCode'] = aller['resource']['substance']['coding'][0]['code']
+		allergy['AllergyDisplay'] = aller['resource']['substance']['coding'][0]['display']
+		allergy['Status'] = aller['resource']['status']
+		allergieslist.append(allergy)
 	allergies = {"Allergies":allergieslist}
 
 	return jsonify(**allergies)
