@@ -103,7 +103,14 @@ def getObservations(id = janegriffinid):
 		    try:
 		        observation['ObservationDetails'] = obs['resource']['code']['text']
 		    except KeyError:
-		        observation['ObservationDetails'] = 'Keep Trying'
+		        try:
+		        	observation['ObservationDetails'] = obs['resource']['valueString']
+		        except KeyError:
+		        	try:
+		        		observation['ObservationDetails'] = obs['resource']['code']['coding'][0]['display']
+		        	except KeyError:
+		        		observation['ObservationDetails'] = 'Keep Trying'
+		
 		observationlist.append(observation)
 	observations = {"Observations":observationlist}
 
