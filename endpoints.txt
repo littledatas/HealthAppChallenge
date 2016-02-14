@@ -1,11 +1,12 @@
 patient
 allergy
 medicationorder
-
-observation
-condition
 encounter
+observation
+
+condition
 
 
 id: 
 ad2f3d7c-4274-4422-a10a-8e2bc99c40
+

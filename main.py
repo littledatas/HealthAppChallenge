@@ -19,6 +19,11 @@ def getPatient(firstname = "Jane", lastname = "Griffin"):
 # Request: http://fhir2.healthintersections.com.au/open/Patient/_search?_format=text/json&family=griffin&name=jane&search-sort=_id
 	firstname = request.args.get('firstname')
 	lastname = request.args.get('lastname')
+	if(firstname is None):
+		firstname = "Jane"
+	if(lastname is None):
+		lastname = "Griffin"
+
 	url = BASEURL + "Patient" + SEARCHURL + "family=" + lastname +"&name=" + firstname + SORTURL
 	response = urllib.urlopen(url)
 	data = json.loads(response.read())
@@ -145,7 +150,10 @@ def getObservations(id = janegriffinid):
 
 @app.route('/encounter')
 def getEncounter(enc_id = 65):
-	url = BASEURL + 'Encounter' + SEARCHURL + "_id=" +str(request.args.get('enc_id'))
+	enc_id = request.args.get('enc_id')
+	if(enc_id is None):
+		enc_id = 65
+	url = BASEURL + 'Encounter' + SEARCHURL + "_id=" +str(enc_id)
 	response = urllib.urlopen(url)
 	data = json.loads(response.read())
 
