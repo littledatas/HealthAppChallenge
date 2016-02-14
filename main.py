@@ -78,6 +78,37 @@ def getMedications(id = janegriffinid):
 	medications = {"Medications":medicationlist}
 	return jsonify(**medications)
 
+@app.route('/observations')
+def getObservations(id = janegriffinid):
+	url = BASEURL + "Observation" + SEARCHURL + "patient._id=" + janegriffinid + SORTURL
+	response = urllib.urlopen(url)
+	data = json.loads(response.read())
+
+	observationlist = []
+	for obs in data['entry']:
+		observation = {}
+		observation['ObservationId'] = obs['resource']['id']
+		try:
+		    observation['ObservationCategory'] = obs['resource']['category']['text']
+		except KeyError:
+		    observation['ObservationCategory'] = 'Medical'
+
+		try:
+		    observation['SubjectId'] = obs['subject']['reference']
+		except KeyError:
+		    observation['SubjectId'] = janegriffinid
+		try:
+		    observation['ObservationDetails'] = obs['resource']['category']['valueCodeableConcept']['coding'][0]['display']
+		except KeyError:
+		    try:
+		        observation['ObservationDetails'] = obs['resource']['code']['text']
+		    except KeyError:
+		        observation['ObservationDetails'] = 'Keep Trying'
+		observationlist.append(observation)
+	observations = {"Observations":observationlist}
+
+	return jsonify(**observations)
+
 def jsonp(func):
     """Wraps JSONified output for JSONP requests."""
     @wraps(func)
