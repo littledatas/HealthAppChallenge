@@ -167,6 +167,26 @@ def getEncounter(enc_id = 65):
 	enc['ServiceProviderId'] = data['entry'][0]['resource']['serviceProvider']['reference']
 	return jsonify(**enc)
 
+@app.route('/conditions')
+def getConditions():
+	url = BASEURL + 'Condition' + SEARCHURL + "patient=" + janegriffinid
+	response = urllib.urlopen(url)
+	data = json.loads(response.read())
+
+	conditionlist = []
+	for cond in data['entry']:
+		condition = {}
+		condition['ConditionId'] = cond['resource']['id']
+		condition['PatiendId'] = cond['resource']['patient']['reference']
+		condition['EncounterId'] = cond['resource']['encounter']['reference']
+		condition['PractitionerId'] = cond['resource']['asserter']['reference']
+		condition['ConditionDisplay'] = cond['resource']['code']['coding'][0]['display']
+		condition['ConditionSeverity'] = cond['resource']['severity']['coding'][0]['display']
+		condition['ConditionProblem'] = cond['resource']['category']['coding'][0]['display']		
+		conditionlist.append(condition)
+	conditions = {"Conditions":conditionlist}
+	return jsonify(**conditions)
+
 def jsonp(func):
     """Wraps JSONified output for JSONP requests."""
     @wraps(func)
