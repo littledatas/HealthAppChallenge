@@ -97,6 +97,7 @@ def getObservations(id = janegriffinid):
 		    observation['SubjectId'] = obs['subject']['reference']
 		except KeyError:
 		    observation['SubjectId'] = janegriffinid
+		
 		try:
 		    observation['ObservationDetails'] = obs['resource']['category']['valueCodeableConcept']['coding'][0]['display']
 		except KeyError:
@@ -111,9 +112,33 @@ def getObservations(id = janegriffinid):
 		        	except KeyError:
 		        		observation['ObservationDetails'] = 'Keep Trying'
 		
-		observationlist.append(observation)
-	observations = {"Observations":observationlist}
+		try:
+			observation['ObservationInterpretation'] = obs['resource']['interpretation']['text']
+		except KeyError:
+			observation['ObservationInterpretation'] = "N/A"
 
+		value = {}
+		valueslist = []
+		try:
+			for val in obs['resource']['component']:
+				value['Measurement'] = val['code']['coding'][0]['display']
+				value['Value'] = val['valueQuantity']['value']
+				value['Unit'] = val['valueQuantity']['unit']
+				valueslist.append(value)
+			observation["Measurements"] = valueslist
+		except KeyError:
+			try:
+				value['Measurement'] = obs['resource']['code']['coding'][0]['display']
+				value['Value'] = obs['resource']['valueQuantity']['value']
+				value['Unit'] = obs['resource']['valueQuantity']['unit']
+				valueslist.append(value)
+				observation["Measurements"] = valueslist
+			except KeyError:
+				observation["Measurements"] = "N/A"
+
+		observationlist.append(observation)
+	
+	observations = {"Observations":observationlist}
 	return jsonify(**observations)
 
 def jsonp(func):
