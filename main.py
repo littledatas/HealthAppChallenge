@@ -205,6 +205,21 @@ def getProvider():
 	prac['OrganizationId'] = data['entry'][0]['resource']['practitionerRole'][0]['managingOrganization']['reference']
 	return jsonify(**prac)
 
+@app.route('/organization')
+def getOrganization():
+	org_id = request.args.get('prov_id')
+	if(org_id is None):
+		org_id = "76feefd6-0d84-436f-b41f-2f9627d358"
+
+	url = BASEURL + 'Organization' + SEARCHURL + "_id=" + org_id
+	response = urllib.urlopen(url)
+	data = json.loads(response.read())
+
+	org = {}
+	org['OrganizationId'] = data['id']
+	org['Name'] = data['entry'][0]['resource']['name']
+	return jsonify(**org)
+
 def jsonp(func):
     """Wraps JSONified output for JSONP requests."""
     @wraps(func)
