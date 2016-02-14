@@ -230,12 +230,23 @@ def getReferrals():
 	for doc in data['entry']:
 		doctor = {}
 		doctor['PractitionerId'] = data['id']
-		name = data['entry'][0]['resource']['name']
+		name = doc['resource']['name']
 		doctor['FirstName'] = name['given'][0]
 		doctor['LastName'] = name['family'][0]
-		doctor['Suffix'] = name['suffix'][0]
-		doctor['Role'] = data['entry'][0]['resource']['practitionerRole'][0]['role']['coding'][0]['display']
-		doctor['OrganizationId'] = data['entry'][0]['resource']['practitionerRole'][0]['managingOrganization']['reference']
+		try:
+			doctor['Suffix'] = name['suffix'][0]
+		except KeyError:
+			doctor['Suffix'] = ''
+
+		try: 
+			doctor['Role'] = doc['resource']['practitionerRole'][0]['role']['coding'][0]['display']
+		except KeyError:
+			doctor['Role'] = ''
+		
+		try:
+			doctor['OrganizationId'] = doc['resource']['practitionerRole'][0]['managingOrganization']['reference']
+		except KeyError:
+			doctor['Organization'] = ''
 		doctorlist.append(doctor)
 	doctors = {'Practitioners': doctorlist}
 	return jsonify(**doctors)
