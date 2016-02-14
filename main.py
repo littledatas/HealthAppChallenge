@@ -187,6 +187,24 @@ def getConditions():
 	conditions = {"Conditions":conditionlist}
 	return jsonify(**conditions)
 
+@app.route('/provider')
+def getProvider():
+	prov_id = request.args.get('prov_id')
+	if(prov_id is None):
+		prov_id = "e0961452-816e-4d3d-bfaa-a9bec791bc"
+	url = BASEURL + 'Practitioner' + SEARCHURL + "_id=" + prov_id
+	response = urllib.urlopen(url)
+	data = json.loads(response.read())
+	prac = {}
+	prac['PractitionerId'] = data['id']
+	name = data['entry'][0]['resource']['name']
+	prac['FirstName'] = name['given'][0]
+	prac['LastName'] = name['family'][0]
+	prac['Suffix'] = name['suffix'][0]
+	prac['Role'] = data['entry'][0]['resource']['practitionerRole'][0]['role']['coding'][0]['display']
+	prac['OrganizationId'] = data['entry'][0]['resource']['practitionerRole'][0]['managingOrganization']['reference']
+	return jsonify(**prac)
+
 def jsonp(func):
     """Wraps JSONified output for JSONP requests."""
     @wraps(func)
