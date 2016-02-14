@@ -220,6 +220,27 @@ def getOrganization():
 	org['Name'] = data['entry'][0]['resource']['name']
 	return jsonify(**org)
 
+@app.route('/referrals')
+def getReferrals():
+	url = 'http://fhir2.healthintersections.com.au/open/Practitioner?_format=json'
+	response = urllib.urlopen(url)
+	data = json.loads(response.read())
+
+	doctorlist = []
+	for doc in data['entry']:
+		doctor = {}
+		doctor['PractitionerId'] = data['id']
+		name = data['entry'][0]['resource']['name']
+		doctor['FirstName'] = name['given'][0]
+		doctor['LastName'] = name['family'][0]
+		doctor['Suffix'] = name['suffix'][0]
+		doctor['Role'] = data['entry'][0]['resource']['practitionerRole'][0]['role']['coding'][0]['display']
+		doctor['OrganizationId'] = data['entry'][0]['resource']['practitionerRole'][0]['managingOrganization']['reference']
+		doctorlist.append(doctor)
+	doctors = {'Practitioners': doctorlist}
+	return jsonify(**doctors)
+
+
 def jsonp(func):
     """Wraps JSONified output for JSONP requests."""
     @wraps(func)
