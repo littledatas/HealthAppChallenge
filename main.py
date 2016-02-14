@@ -17,6 +17,8 @@ janegriffinid = 'ad2f3d7c%2D4274%2D4422%2Da10a%2D8e2bc99c40'
 @app.route('/patient')
 def getPatient(firstname = "Jane", lastname = "Griffin"):
 # Request: http://fhir2.healthintersections.com.au/open/Patient/_search?_format=text/json&family=griffin&name=jane&search-sort=_id
+	firstname = request.args.get('firstname')
+	lastname = request.args.get('lastname')
 	url = BASEURL + "Patient" + SEARCHURL + "family=" + lastname +"&name=" + firstname + SORTURL
 	response = urllib.urlopen(url)
 	data = json.loads(response.read())
@@ -140,6 +142,22 @@ def getObservations(id = janegriffinid):
 	
 	observations = {"Observations":observationlist}
 	return jsonify(**observations)
+
+@app.route('/encounter')
+def getEncounter(enc_id = 65):
+	url = BASEURL + 'Encounter' + SEARCHURL + "_id=" +str(request.args.get('enc_id'))
+	response = urllib.urlopen(url)
+	data = json.loads(response.read())
+
+	enc = {}
+	enc['EncounterId'] = data['entry'][0]['resource']['id']
+	enc['PatiendId'] = data['entry'][0]['resource']['patient']['reference']
+	enc['PractitionerId'] = data['entry'][0]['resource']['participant'][0]['individual']['reference']
+	enc['StartDate'] = data['entry'][0]['resource']['period']['start']
+	enc['EndDate'] = data['entry'][0]['resource']['period']['end']
+	enc['LocationId'] = data['entry'][0]['resource']['location'][0]['location']['reference']
+	enc['ServiceProviderId'] = data['entry'][0]['resource']['serviceProvider']['reference']
+	return jsonify(**enc)
 
 def jsonp(func):
     """Wraps JSONified output for JSONP requests."""
